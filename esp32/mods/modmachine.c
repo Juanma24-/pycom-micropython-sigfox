@@ -183,6 +183,9 @@ STATIC mp_obj_t machine_deepsleep (uint n_args, const mp_obj_t *arg) {
     mperror_enable_heartbeat(false);
     bt_deinit(NULL);
     wlan_deinit(NULL);
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH,ESP_PD_OPTION_OFF);   //Perifericos off
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM,ESP_PD_OPTION_OFF);
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM,ESP_PD_OPTION_OFF);
     if (n_args == 0) {
         mach_expected_wakeup_time = 0;
         esp_deep_sleep_start();

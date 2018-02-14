@@ -121,7 +121,7 @@ void TASK_Micropython (void *pvParameters) {
     volatile uint32_t sp = (uint32_t)get_sp();
     uint32_t gc_pool_size;
     bool soft_reset = false;
-    bool wifi_on_boot;
+    bool wifi_on_boot = false;
 
     // init the antenna select switch here
     antenna_init0();
@@ -131,7 +131,7 @@ void TASK_Micropython (void *pvParameters) {
         rtc_init0();
     }
 
-    // initialization that must not be repeted after a soft reset
+    // initialization that must not be repeated after a soft reset
     mptask_preinit();
 #if MICROPY_PY_THREAD
     mp_thread_preinit(mpTaskStack);
@@ -161,7 +161,7 @@ void TASK_Micropython (void *pvParameters) {
     alarm_preinit();
     pin_preinit();
 
-    wifi_on_boot = config_get_wifi_on_boot();
+    wifi_on_boot = config_get_wifi_on_boot();			//IDEALMENTE SERÍA FALSE PERO SE QUEDA POR SEGURIDAD
 
 soft_reset:
 
@@ -192,7 +192,7 @@ soft_reset:
     mp_hal_init(soft_reset);
     readline_init0();
     mod_network_init0();
-    modbt_init0();
+    //modbt_init0();								//NO ES NECESARIO INICIAR BLUETOOTH ES NUESTRA APP
     machtimer_init0();
     modpycom_init0();
     bool safeboot = false;
@@ -209,7 +209,7 @@ soft_reset:
 #if defined(LOPY) || defined (LOPY4) || defined (FIPY)
         modlora_init0();
 #endif
-#if defined(SIPY) || defined(LOPY4) || defined (FIPY)
+#if defined(SIPY) || defined (FIPY)				//BORRADO defined(LOPY4) NO ES NECESARIO SIGFOX
         modsigfox_init0();
 #endif
 #if defined(GPY) || defined (FIPY)
@@ -225,7 +225,7 @@ soft_reset:
     mptask_update_lpwan_mac_address();
 #endif
 
-#if defined(SIPY) || defined(LOPY4) || defined(FIPY)
+#if defined(SIPY) || defined(FIPY) //BORRADO defined(LOPY4) NO ES NECESARIO SIGFOX
     sigfox_update_id();
     sigfox_update_pac();
     sigfox_update_private_key();
@@ -320,7 +320,7 @@ soft_reset_exit:
  ******************************************************************************/
 STATIC void mptask_preinit (void) {
     mperror_pre_init();
-    wlan_pre_init();
+    //wlan_pre_init();
     xTaskCreatePinnedToCore(TASK_Servers, "Servers", SERVERS_STACK_LEN, NULL, SERVERS_PRIORITY, &svTaskHandle, 1);
 }
 

@@ -9,7 +9,7 @@
 
 # select the board to build for: if not given on the command line
 # default to WIPY
-BOARD ?= WIPY
+BOARD ?= LOPY4
 ifeq ($(wildcard boards/$(BOARD)/.),)
     $(error Invalid BOARD specified)
 endif

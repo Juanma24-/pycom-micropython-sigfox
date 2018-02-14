@@ -769,6 +769,7 @@ static void TASK_LoRa (void *pvParameters) {
                                 mibReq.Param.AdrAckCounter = adrAcks;
                                 LoRaMacMibSetRequestConfirm( &mibReq );
 
+                                //TODO:CHECK
                                 // write the MAC params directly from the NVRAM
                                 length = sizeof(LoRaMacParams_t);
                                 modlora_nvs_get_blob(E_LORA_NVS_ELE_MAC_PARAMS, (void *)LoRaMacGetMacParams(), &length);
@@ -2038,7 +2039,18 @@ static int lora_socket_socket (mod_network_socket_obj_t *s, int *_errno) {
     }
     s->sock_base.u.sd = 1;
 #if defined(USE_BAND_868)
-    LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, DR_5);
+
+    LoRaMacParams_t *LoRaMacParams;																		//LoRac Mac Parameters Variable
+    bool result;
+    uint32_t length = sizeof(LoRaMacParams_t);
+    result = modlora_nvs_get_blob(E_LORA_NVS_ELE_MAC_PARAMS, (void*)LoRaMacParams, &length);				//Get LoRa Parameters from NVRAM
+
+    if (result && lora_validate_data_rate(LoRaMacParams->ChannelsDatarate)) {								//Current DataRate
+    //if(0){
+         LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, LoRaMacParams->ChannelsDatarate);					    //Set current DataRate
+    }else{
+         LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, DR_5);													//Set Default DataRate
+    }
 #else
     LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, DR_3);
 #endif
@@ -2129,7 +2141,24 @@ static int lora_socket_setsockopt(mod_network_socket_obj_t *s, mp_uint_t level, 
             *_errno = MP_EOPNOTSUPP;
             return -1;
         }
-        LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, *(uint8_t *)optval);
+        	//TODO: Check the data rate from ADR and not always force
+        LoRaMacParams_t *LoRaMacParams;
+        uint32_t length = sizeof(LoRaMacParams_t);
+        modlora_nvs_get_blob(E_LORA_NVS_ELE_MAC_PARAMS, (void*)LoRaMacParams, &length);
+
+        LoRaMacParams_t *LoRaMacParams;																		//LoRac Mac Parameters Variable
+            bool result;
+            uint32_t length = sizeof(LoRaMacParams_t);
+            result = modlora_nvs_get_blob(E_LORA_NVS_ELE_MAC_PARAMS, (void*)LoRaMacParams, &length);				//Get LoRa Parameters from NVRAM
+
+            if (result && lora_validate_data_rate(LoRaMacParams->ChannelsDatarate)) {								//Current DataRate
+            //if(0){
+                 LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, LoRaMacParams->ChannelsDatarate);					    //Set current DataRate
+            }else{
+                 LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, *(uint8_t *)optval);								    //Set Default DataRate
+            }
+
+        //LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, *(uint8_t *)optval);
     } else {
         *_errno = MP_EOPNOTSUPP;
         return -1;
