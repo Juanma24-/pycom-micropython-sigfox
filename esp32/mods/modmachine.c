@@ -49,6 +49,7 @@
 #include "sdkconfig.h"
 #include "esp_system.h"
 #include "esp_spi_flash.h"
+#include "esp_clk.h"						//Add for CPU Frequency reading
 #include "nvs_flash.h"
 #include "esp_event.h"
 #include "esp_sleep.h"
@@ -147,6 +148,8 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_reset_obj, machine_reset);
 
 STATIC mp_obj_t machine_freq(void) {
     return mp_obj_new_int(ets_get_cpu_frequency() * 1000000);
+	//return mp_obj_new_int(esp_clk_cpu_freq());
+	//return mp_obj_new_int(esp_clk_apb_freq());
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_freq_obj, machine_freq);
 

@@ -2157,10 +2157,9 @@ static int lora_socket_socket (mod_network_socket_obj_t *s, int *_errno) {
         break;
     }
     
-    LoRaMacParams_t *LoRaMacParams;																		//LoRac Mac Parameters Variable
-    bool result;
+    LoRaMacParams_t *LoRaMacParams = NULL;																		//LoRac Mac Parameters Variable
     uint32_t length = sizeof(LoRaMacParams_t);
-    result = modlora_nvs_get_blob(E_LORA_NVS_ELE_MAC_PARAMS, (void*)LoRaMacParams, &length);				//Get LoRa Parameters from NVRAM
+    bool result = modlora_nvs_get_blob(E_LORA_NVS_ELE_MAC_PARAMS, (void*)LoRaMacParams, &length);				//Get LoRa Parameters from NVRAM
 
     if (result && lora_validate_data_rate(LoRaMacParams->ChannelsDatarate)) {								//Current DataRate
     //if(0){
@@ -2253,21 +2252,19 @@ static int lora_socket_setsockopt(mod_network_socket_obj_t *s, mp_uint_t level, 
             return -1;
         }
         	//TODO: Check the data rate from ADR and not always force
-        LoRaMacParams_t *LoRaMacParams;
+        LoRaMacParams_t *LoRaMacParams = NULL;                                                //LoRac Mac Parameters Variable
         uint32_t length = sizeof(LoRaMacParams_t);
         modlora_nvs_get_blob(E_LORA_NVS_ELE_MAC_PARAMS, (void*)LoRaMacParams, &length);
+        //Get LoRa Parameters from NVRAM
+        bool result = modlora_nvs_get_blob(E_LORA_NVS_ELE_MAC_PARAMS, (void*)LoRaMacParams, &length);
 
-        LoRaMacParams_t *LoRaMacParams;																		//LoRac Mac Parameters Variable
-            bool result;
-            uint32_t length = sizeof(LoRaMacParams_t);
-            result = modlora_nvs_get_blob(E_LORA_NVS_ELE_MAC_PARAMS, (void*)LoRaMacParams, &length);				//Get LoRa Parameters from NVRAM
 
-            if (result && lora_validate_data_rate(LoRaMacParams->ChannelsDatarate)) {								//Current DataRate
-            //if(0){
-                 LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, LoRaMacParams->ChannelsDatarate);					    //Set current DataRate
-            }else{
-                 LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, *(uint8_t *)optval);								    //Set Default DataRate
-            }
+        if (result && lora_validate_data_rate(LoRaMacParams->ChannelsDatarate)) {								//Current DataRate
+        //if(0){
+             LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, LoRaMacParams->ChannelsDatarate);					    //Set current DataRate
+        }else{
+             LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, *(uint8_t *)optval);								    //Set Default DataRate
+        }
 
         //LORAWAN_SOCKET_SET_DR(s->sock_base.u.sd, *(uint8_t *)optval);
     } else {
