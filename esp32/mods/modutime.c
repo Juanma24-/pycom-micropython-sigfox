@@ -160,7 +160,7 @@ STATIC mp_obj_t time_ticks_ms(void) {
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(time_ticks_ms_obj, time_ticks_ms);
 
 STATIC mp_obj_t time_ticks_us(void) {
-    return mp_obj_new_int_from_uint(system_get_rtc_time());
+    return mp_obj_new_int_from_uint(mp_hal_ticks_us());
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(time_ticks_us_obj, time_ticks_us);
 
