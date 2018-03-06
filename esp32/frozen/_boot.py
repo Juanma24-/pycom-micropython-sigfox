@@ -9,8 +9,8 @@ from network import Bluetooth
 #pycom.heartbeat(False)
 #-----------------------#
 #UART no activa
-uart = UART(0, 115200)
-os.dupterm(uart)
+#uart = UART(0, 115200)
+#os.dupterm(uart)
 #-----------------------#
 #Desactiva WiFi
 #wlan = network.WLAN(mode=network.WLAN.STA)

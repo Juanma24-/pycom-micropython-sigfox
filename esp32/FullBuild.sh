@@ -2,7 +2,7 @@
 
 #LOPY shell make file
 
-BOARD="LOPY"
+BOARD="LOPY4"
 BTYPE="release"
 BAND="USE_BAND_868"
 PORT="/dev/cu.usbmodemPy343431"
