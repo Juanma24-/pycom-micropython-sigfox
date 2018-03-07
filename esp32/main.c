@@ -56,6 +56,7 @@ TaskHandle_t svTaskHandle;
 #if defined(LOPY) || defined (LOPY4) || defined (FIPY)
 TaskHandle_t xLoRaTaskHndl;
 #endif
+//TODO: Eliminar de LOPY4
 #if defined(SIPY) || defined (LOPY4) || defined (FIPY)
 TaskHandle_t xSigfoxTaskHndl;
 #endif

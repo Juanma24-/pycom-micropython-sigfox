@@ -34,21 +34,21 @@ class Node:
         self.si = SI7006A20(self.py)                                            # Instancia Sensor de Humedad y tempertura
 
 #------------------------------------------------------------------------------#
-    def connect(self,app_eui, app_key):
+    def connect(self,dev_eui,app_eui, app_key):
         """
         Connect device to LoRa.
         Set the socket and lora instances.
         """
         # Initialize LoRa in LORAWAN mode
-        self.lora = LoRa(mode = LoRa.LORAWAN,device_class=LoRa.CLASS_A)
+        self.lora = LoRa(mode = LoRa.LORAWAN,device_class=LoRa.CLASS_A,region=LoRa.EU868)
         # Set the 3 default channels to the same frequency (must be before
         # sending the OTAA join request)
         self.lora.add_channel(0, frequency=868100000, dr_min=0, dr_max=5)
         self.lora.add_channel(1, frequency=868100000, dr_min=0, dr_max=5)
         self.lora.add_channel(2, frequency=868100000, dr_min=0, dr_max=5)
         # Join a network using OTAA (Over the Air Activation)
-        self.lora.join(activation = LoRa.OTAA, auth = (app_eui, app_key),
-                    timeout = 0, dr=5)                                                #login for TheThingsNetwork see here:
+        self.lora.join(activation = LoRa.OTAA, auth = (dev_eui,app_eui, app_key),
+                    timeout = 0, dr=self.dr)                                                #login for TheThingsNetwork see here:
                                                                                 #https://www.thethingsnetwork.org/forum/t/lopy-otaa-example/4471
         # Wait until the module has joined the network
         while not self.lora.has_joined():
@@ -64,7 +64,7 @@ class Node:
         """
         if py.get_wake_reason() == WAKE_REASON_TIMER:                           #Si despierta tras deepsleep
             # Initialize LoRa in LORAWAN mode
-            self.lora = LoRa(mode = LoRa.LORAWAN,adr=True,device_class=LoRa.CLASS_A)
+            self.lora = LoRa(mode = LoRa.LORAWAN,adr=True,device_class=LoRa.CLASS_A,region=LoRa.EU868)
             # restore the LoRaWAN connection state
             try:
                 self.lora.nvram_restore()
@@ -130,7 +130,7 @@ class Node:
         pressure = (int(self.mp.pressure())-90000).to_bytes(2,'little')                     #Segundo Elemento Lista: Presión (entero)
         humidity = int(round(self.si.humidity(),2)*100).to_bytes(2,'little')                #Tercer Elemento Lista: Humedad (dos decimales)
         temperature = int(round(self.si.temperature(),2)*100).to_bytes(2,'little')          #Cuarto Elemento Lista: Temperatura (dos decimales)
-        battery = int(round(self.py.read_battery_voltage(),2)*10000-33000).to_bytes(2,'little') #Quinto Elemento Lista: Voltaje (cuatro decimales)
+        battery = int(round(self.py.read_battery_voltage(),4)*10000-33000).to_bytes(2,'little') #Quinto Elemento Lista: Voltaje (cuatro decimales)
         light = int(self.lt.light()[0]).to_bytes(2,'little')                                #Primer Elemento Lista: Luminosidad (entero)
         reading = light+pressure+humidity+temperature+battery                   #Union de tipos bytes
         return reading
@@ -138,7 +138,7 @@ class Node:
 #Codigo principal
                                                          #Desactiva el heartbeat
 app_eui = binascii.unhexlify('70B3D57ED0009F73')                                #ID de la app. (Seleccionada por el usuario)
-dev_eui = binascii.unhexlify('00F2DA4DA3ACB272')
+dev_eui = binascii.unhexlify('70B3D54998EA594A')
 app_key = binascii.unhexlify('054BFCAC2632EB70D56F4BCBB8D95F02')                #Clave de la app para realizar el handshake. Única para cada dispositivo.
 ajuste = 10                                                                     #Numero de segundos para que el intervalo sea exacto en el Network Server
                                                                                 #TODO: REAL TIME
@@ -197,7 +197,7 @@ else:                                                                           
     sleep_time = 300                                                            #Valor por defecto de sleep_time (Minimo segun Fair Acess Policy TTN)
     data_rate = 5
     pycom.wifi_on_boot(False)                                                   # disable WiFi on boot TODO: Intentar en versiones posteriores, da un Core Error.
-
+    pycom.heartbeat_on_boot(False)
     try:
         pycom.nvs_set('sleep_time', sleep_time)                                 #Guarda el valor por defecto de sleep_time en NVRAM
         pycom.nvs_set('data_rate', data_rate)
@@ -206,7 +206,7 @@ else:                                                                           
         pass
 
     n = Node(sleep_time,data_rate,py)                                           #Crea una instancia de Node
-    n.connect(app_eui, app_key)                                                 #Join LoRaWAN with OTAA
+    n.connect(dev_eui,app_eui, app_key)                                                 #Join LoRaWAN with OTAA
     #ota = WiFiOTA(WIFI_SSID,WIFI_PW,
     #          SERVER_IP,  # Update server address
     #          8000)  # Update server port

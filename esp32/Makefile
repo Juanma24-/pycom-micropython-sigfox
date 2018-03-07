@@ -42,11 +42,13 @@ CFLAGS_XTENSA_OPT = -Os
 CFLAGS_XTENSA_PSRAM = -mfix-esp32-psram-cache-issue
 
 CFLAGS = $(CFLAGS_XTENSA) $(CFLAGS_XTENSA_PSRAM) $(CFLAGS_XTENSA_OPT) -nostdlib -std=gnu99 -g3 -ggdb -fstrict-volatile-bitfields -Iboards/$(BOARD)
+#TODO: SF. Eliminar las flags de comilacion de SIGFOX 
 CFLAGS_SIGFOX = $(CFLAGS_XTENSA) -O2 -nostdlib -std=gnu99 -g3 -ggdb -fstrict-volatile-bitfields -Iboards/$(BOARD)
 
 LDFLAGS = -nostdlib -Wl,-Map=$(@:.elf=.map) -Wl,--no-check-sections -u call_user_start_cpu0
 LDFLAGS += -Wl,-static -Wl,--undefined=uxTopUsedPriority -Wl,--gc-sections
 
+#TODO: Eliminar las librerias de Bluetooth y sigfox
 LIBS = -L$(ESP_IDF_COMP_PATH)/esp32/lib -L$(ESP_IDF_COMP_PATH)/esp32/ld -L$(ESP_IDF_COMP_PATH)/bt/lib \
        -L$(ESP_IDF_COMP_PATH)/esp32 -L$(ESP_IDF_COMP_PATH)/newlib/lib -Lbootloader \
        -Llib -lnvs_flash -ltcpip_adapter -L$(BUILD) -lhal -lcore -lwps -lcoexist -lstdc++ \
@@ -61,6 +63,7 @@ ifeq ($(BOARD), $(filter $(BOARD), FIPY))
     LIBS += sigfox/modsigfox_fipy.a
 endif
 
+#TODO: Eliminar esta directiva
 ifeq ($(BOARD), $(filter $(BOARD), LOPY4))
     LIBS += sigfox/modsigfox_lopy4.a
 endif
