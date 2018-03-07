@@ -49,10 +49,11 @@
 #if defined (LOPY) || defined (LOPY4) || defined (FIPY)
 #include "modlora.h"
 #endif
-//TODO:Eliminar de LOPY4
-#if defined (SIPY) || defined(LOPY4) || defined (FIPY)
+
+#if defined (SIPY) || defined (FIPY)
 #include "sigfox/modsigfox.h"
 #endif
+
 #if defined (GPY) || defined (FIPY)
 #include "modlte.h"
 #endif
@@ -63,8 +64,7 @@
 #include "pycom_config.h"
 #include "mpsleep.h"
 #include "machrtc.h"
-//TODO: Eliminar Bluetooth
-#include "modbt.h"
+//#include "modbt.h"
 #include "machtimer.h"
 #include "machtimer_alarm.h"
 #include "mptask.h"
@@ -221,8 +221,8 @@ soft_reset:
 #if defined(LOPY) || defined (LOPY4) || defined (FIPY)
         modlora_init0();
 #endif
-//TODO: Eliminar Sigfox para Lopy4
-#if defined(SIPY) || defined (FIPY)|| defined (LOPY4)
+
+#if defined(SIPY) || defined (FIPY)
         modsigfox_init0();
 #endif
     }
@@ -235,8 +235,8 @@ soft_reset:
     mptask_update_lpwan_mac_address();
 #endif
 
-//TODO: Eliminar Sigfox para Lopy4
-#if defined(SIPY) || defined(FIPY) || defined(LOPY4)
+
+#if defined(SIPY) || defined(FIPY)
     sigfox_update_id();
     sigfox_update_pac();
     sigfox_update_private_key();

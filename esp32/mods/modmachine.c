@@ -68,7 +68,7 @@
 #include "pybadc.h"
 #include "pybdac.h"
 #include "pybsd.h"
-#include "modbt.h"
+//#include "modbt.h"
 #include "modwlan.h"
 #include "machwdt.h"
 #include "machcan.h"
@@ -185,7 +185,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_sleep_obj, machine_sleep);
 
 STATIC mp_obj_t machine_deepsleep (uint n_args, const mp_obj_t *arg) {
     mperror_enable_heartbeat(false);
-    bt_deinit(NULL);
+    //bt_deinit(NULL);
     wlan_deinit(NULL);
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH,ESP_PD_OPTION_OFF);   //Perifericos off
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM,ESP_PD_OPTION_OFF);

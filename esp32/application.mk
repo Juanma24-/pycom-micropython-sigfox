@@ -46,23 +46,23 @@ APP_INC += -I$(ESP_IDF_COMP_PATH)/tcpip_adapter/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/log/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/sdmmc/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/vfs/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/device/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/dm
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/hh
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/sys/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/gatt/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/gap/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/l2cap/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/btcore/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/osi/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/hci/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/gki/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/api/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/btc/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/device/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/dm
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/hh
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/sys/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/gatt/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/gap/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/l2cap/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/btcore/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/osi/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/hci/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/gki/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/api/include
+#APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/btc/include
 APP_INC += -I../lib/mp-readline
 APP_INC += -I../lib/netutils
 APP_INC += -I../lib/fatfs
@@ -108,6 +108,8 @@ APP_LIB_SRC_C = $(addprefix lib/,\
 	fatfs/option/ccsbcs.c \
 	)
 
+
+#modbt.c 
 APP_MODS_SRC_C = $(addprefix mods/,\
 	machuart.c \
 	machpin.c \
@@ -135,7 +137,6 @@ APP_MODS_SRC_C = $(addprefix mods/,\
 	pybdac.c \
 	pybsd.c \
 	modussl.c \
-	modbt.c \
 	modled.c \
 	machwdt.c \
 	machrmt.c \

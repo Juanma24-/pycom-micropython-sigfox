@@ -11,18 +11,18 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "controller.h"
+//#include "controller.h"
 
-#include "esp_bt.h"
-#include "bt_trace.h"
-#include "bt_types.h"
-#include "btm_api.h"
-#include "bta_api.h"
-#include "bta_gatt_api.h"
-#include "esp_gap_ble_api.h"
-#include "esp_gattc_api.h"
-#include "esp_gatt_defs.h"
-#include "esp_bt_main.h"
+//#include "esp_bt.h"
+//#include "bt_trace.h"
+//#include "bt_types.h"
+//#include "btm_api.h"
+//#include "bta_api.h"
+//#include "bta_gatt_api.h"
+//#include "esp_gap_ble_api.h"
+//#include "esp_gattc_api.h"
+//#include "esp_gatt_defs.h"
+//#include "esp_bt_main.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -56,10 +56,11 @@ TaskHandle_t svTaskHandle;
 #if defined(LOPY) || defined (LOPY4) || defined (FIPY)
 TaskHandle_t xLoRaTaskHndl;
 #endif
-//TODO: Eliminar de LOPY4
-#if defined(SIPY) || defined (LOPY4) || defined (FIPY)
+
+#if defined(SIPY) || defined (FIPY) || defined(LOPY4)
 TaskHandle_t xSigfoxTaskHndl;
 #endif
+
 #if defined(GPY) || defined (FIPY)
 TaskHandle_t xLTETaskHndl;
 #endif
