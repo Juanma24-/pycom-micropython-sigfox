@@ -89,16 +89,9 @@ mp_obj_t mod_network_find_nic(const mod_network_socket_obj_t *s, const uint8_t *
         mp_obj_t nic = MP_STATE_PORT(mod_network_nic_list).items[i];
         // we want a raw network card
         if (ip == NULL) {
-        #if defined (LOPY) || defined(LOPY4) || defined (FIPY)
             if (mp_obj_get_type(nic) == (mp_obj_type_t *)&mod_network_nic_type_lora && s->sock_base.u.u_param.domain == AF_LORA) {
                 return nic;
             }
-        #endif
-        //#if defined (SIPY) || defined (LOPY4) || defined (FIPY)
-        //    if (mp_obj_get_type(nic) == (mp_obj_type_t *)&mod_network_nic_type_sigfox && s->sock_base.u.u_param.domain == AF_SIGFOX) {
-        //        return nic;
-        //    }
-        //#endif
         } else if (s->sock_base.u.u_param.domain == AF_INET) {
             return nic;
         }
@@ -197,16 +190,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(network_server_deinit_obj, network_server_deini
 STATIC const mp_map_elem_t mp_module_network_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR___name__),            MP_OBJ_NEW_QSTR(MP_QSTR_network) },
     { MP_OBJ_NEW_QSTR(MP_QSTR_WLAN),                (mp_obj_t)&mod_network_nic_type_wlan },
-#if defined (LOPY) || defined(LOPY4) || defined (FIPY)
     { MP_OBJ_NEW_QSTR(MP_QSTR_LoRa),                (mp_obj_t)&mod_network_nic_type_lora },
-#endif
-//#if defined (SIPY) || defined (LOPY4) || defined (FIPY)
-//    { MP_OBJ_NEW_QSTR(MP_QSTR_Sigfox),              (mp_obj_t)&mod_network_nic_type_sigfox },
-//#endif
-#if defined(FIPY) || defined(GPY)
-    { MP_OBJ_NEW_QSTR(MP_QSTR_LTE),                 (mp_obj_t)&mod_network_nic_type_lte },
-#endif
-    //{ MP_OBJ_NEW_QSTR(MP_QSTR_Bluetooth),           (mp_obj_t)&mod_network_nic_type_bt },
     { MP_OBJ_NEW_QSTR(MP_QSTR_Server),              (mp_obj_t)&network_server_type },
 };
 

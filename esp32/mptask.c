@@ -220,16 +220,13 @@ soft_reset:
     MP_STATE_PORT(machine_config_main) = MP_OBJ_NULL;
 
     // enable telnet and ftp
-    if (wifi_on_boot) {
-        servers_start();
-    }
+    //if (wifi_on_boot) {
+    //    servers_start();
+    //}
 
     pyexec_frozen_module("_boot.py");
 
     if (!safeboot) {
-    #if defined(GPY) || defined (FIPY)
-        modlte_init0();
-    #endif
         // run boot.py
         int ret = pyexec_file("boot.py");
         if (ret & PYEXEC_FORCED_EXIT) {
@@ -304,7 +301,7 @@ soft_reset_exit:
 STATIC void mptask_preinit (void) {
     mperror_pre_init();
     //wlan_pre_init();
-    xTaskCreatePinnedToCore(TASK_Servers, "Servers", SERVERS_STACK_LEN, NULL, SERVERS_PRIORITY, &svTaskHandle, 1);
+    //xTaskCreatePinnedToCore(TASK_Servers, "Servers", SERVERS_STACK_LEN, NULL, SERVERS_PRIORITY, &svTaskHandle, 1);
 }
 
 STATIC void mptask_init_sflash_filesystem (void) {
