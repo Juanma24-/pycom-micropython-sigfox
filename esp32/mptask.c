@@ -50,9 +50,9 @@
 #include "modlora.h"
 #endif
 
-#if defined (SIPY) || defined (FIPY)
-#include "sigfox/modsigfox.h"
-#endif
+//#if defined (SIPY) || defined (FIPY)
+//#include "sigfox/modsigfox.h"
+//#endif
 
 #if defined (GPY) || defined (FIPY)
 #include "modlte.h"
@@ -222,9 +222,9 @@ soft_reset:
         modlora_init0();
 #endif
 
-#if defined(SIPY) || defined (FIPY)
-        modsigfox_init0();
-#endif
+//#if defined(SIPY) || defined (FIPY)
+//        modsigfox_init0();
+//#endif
     }
 
     // initialize the serial flash file system
@@ -236,12 +236,12 @@ soft_reset:
 #endif
 
 
-#if defined(SIPY) || defined(FIPY)
-    sigfox_update_id();
-    sigfox_update_pac();
-    sigfox_update_private_key();
-    sigfox_update_public_key();
-#endif
+//#if defined(SIPY) || defined(FIPY)
+//    sigfox_update_id();
+//    sigfox_update_pac();
+//    sigfox_update_private_key();
+//    sigfox_update_public_key();
+//#endif
 
     // append the flash paths to the system path
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash));

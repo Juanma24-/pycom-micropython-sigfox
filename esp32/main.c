@@ -57,9 +57,9 @@ TaskHandle_t svTaskHandle;
 TaskHandle_t xLoRaTaskHndl;
 #endif
 
-#if defined(SIPY) || defined (FIPY) || defined(LOPY4)
-TaskHandle_t xSigfoxTaskHndl;
-#endif
+//#if defined(SIPY) || defined (FIPY) || defined(LOPY4)
+//TaskHandle_t xSigfoxTaskHndl;
+//#endif
 
 #if defined(GPY) || defined (FIPY)
 TaskHandle_t xLTETaskHndl;

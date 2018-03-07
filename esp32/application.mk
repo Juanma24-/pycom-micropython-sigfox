@@ -286,9 +286,9 @@ endif
 ifeq ($(BOARD), $(filter $(BOARD), SIPY))
 OBJ += $(addprefix $(BUILD)/, $(APP_SIGFOX_MOD_SRC_C:.c=.o))
 endif
-ifeq ($(BOARD), $(filter $(BOARD), LOPY4 FIPY))
-OBJ += $(addprefix $(BUILD)/, $(APP_SIGFOX_MOD_SRC_C:.c=.o))
-endif
+#ifeq ($(BOARD), $(filter $(BOARD), LOPY4 FIPY))
+#OBJ += $(addprefix $(BUILD)/, $(APP_SIGFOX_MOD_SRC_C:.c=.o))
+#endif
 ifeq ($(BOARD),$(filter $(BOARD), FIPY GPY))
 OBJ += $(addprefix $(BUILD)/, $(APP_LTE_SRC_C:.c=.o) $(APP_MODS_LTE_SRC_C:.c=.o))
 endif
@@ -306,9 +306,9 @@ SRC_QSTR += $(APP_MODS_SRC_C) $(APP_UTIL_SRC_C) $(APP_STM_SRC_C)
 ifeq ($(BOARD), $(filter $(BOARD), LOPY LOPY4 FIPY))
 SRC_QSTR += $(APP_MODS_LORA_SRC_C)
 endif
-ifeq ($(BOARD), $(filter $(BOARD), SIPY LOPY4 FIPY))
-SRC_QSTR += $(APP_SIGFOX_MOD_SRC_C)
-endif
+#ifeq ($(BOARD), $(filter $(BOARD), SIPY LOPY4 FIPY))
+#SRC_QSTR += $(APP_SIGFOX_MOD_SRC_C)
+#endif
 ifeq ($(BOARD),$(filter $(BOARD), FIPY GPY))
 SRC_QSTR += $(APP_MODS_LTE_SRC_C)
 endif
@@ -335,11 +335,11 @@ BOOT_LIBS = -Wl,--start-group $(B_LIBS) $(BUILD)/bootloader/bootloader.a -Wl,--e
 # debug / optimization options
 ifeq ($(BTYPE), debug)
     CFLAGS += -DDEBUG
-    CFLAGS_SIGFOX += -DDEBUG
+    #CFLAGS_SIGFOX += -DDEBUG
 else
     ifeq ($(BTYPE), release)
         CFLAGS += -DNDEBUG
-        CFLAGS_SIGFOX += -DNDEBUG
+        #CFLAGS_SIGFOX += -DNDEBUG
     else
         $(error Invalid BTYPE specified)
     endif
@@ -365,10 +365,10 @@ ifeq ($(BOARD), LOPY)
 endif
 ifeq ($(BOARD), LOPY4)
     APP_BIN = $(BUILD)/lopy4.bin
-    $(BUILD)/sigfox/radio_sx127x.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/sigfox/timer.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/sigfox/transmission.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/sigfox/targets/%.o: CFLAGS = $(CFLAGS_SIGFOX)
+    #$(BUILD)/sigfox/radio_sx127x.o: CFLAGS = $(CFLAGS_SIGFOX)
+    #$(BUILD)/sigfox/timer.o: CFLAGS = $(CFLAGS_SIGFOX)
+    #$(BUILD)/sigfox/transmission.o: CFLAGS = $(CFLAGS_SIGFOX)
+    #$(BUILD)/sigfox/targets/%.o: CFLAGS = $(CFLAGS_SIGFOX)
     $(BUILD)/lora/spi-board.o: CFLAGS = $(CFLAGS_SIGFOX)
 endif
 ifeq ($(BOARD), SIPY)
