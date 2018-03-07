@@ -68,14 +68,10 @@
 #include "pybadc.h"
 #include "pybdac.h"
 #include "pybsd.h"
-//#include "modbt.h"
 #include "modwlan.h"
 #include "machwdt.h"
 #include "machcan.h"
 #include "machrmt.h"
-#if defined (GPY) || defined (FIPY)
-#include "lteppp.h"
-#endif
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -118,7 +114,6 @@ void machine_init0(void) {
 extern TaskHandle_t mpTaskHandle;
 extern TaskHandle_t svTaskHandle;
 extern TaskHandle_t xLoRaTaskHndl;
-//extern TaskHandle_t xSigfoxTaskHndl;
 
 STATIC mp_obj_t machine_info(void) {
     // FreeRTOS info
@@ -127,12 +122,7 @@ STATIC mp_obj_t machine_info(void) {
     mp_printf(&mp_plat_print, "---------------------------------------------\n");
     mp_printf(&mp_plat_print, "MPTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark((TaskHandle_t)mpTaskHandle));
     mp_printf(&mp_plat_print, "ServersTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark((TaskHandle_t)svTaskHandle));
-#if defined (LOPY) || defined (LOPY4) || defined (FIPY)
     mp_printf(&mp_plat_print, "LoRaTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark((TaskHandle_t)xLoRaTaskHndl));
-#endif
-//#if defined (SIPY) || defined (LOPY4) || defined (FIPY)
-//    mp_printf(&mp_plat_print, "SigfoxTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark((TaskHandle_t)xSigfoxTaskHndl));
-//#endif
     mp_printf(&mp_plat_print, "TimerTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark(xTimerGetTimerDaemonTaskHandle()));
     mp_printf(&mp_plat_print, "IdleTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark(xTaskGetIdleTaskHandle()));
     mp_printf(&mp_plat_print, "System free heap: %d\n", (unsigned int)esp_get_free_heap_size());
@@ -185,7 +175,6 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_sleep_obj, machine_sleep);
 
 STATIC mp_obj_t machine_deepsleep (uint n_args, const mp_obj_t *arg) {
     mperror_enable_heartbeat(false);
-    //bt_deinit(NULL);
     wlan_deinit(NULL);
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH,ESP_PD_OPTION_OFF);   //Perifericos off
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM,ESP_PD_OPTION_OFF);

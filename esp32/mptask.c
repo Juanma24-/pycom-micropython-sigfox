@@ -46,17 +46,7 @@
 #include "modled.h"
 #include "esp_log.h"
 
-#if defined (LOPY) || defined (LOPY4) || defined (FIPY)
 #include "modlora.h"
-#endif
-
-//#if defined (SIPY) || defined (FIPY)
-//#include "sigfox/modsigfox.h"
-//#endif
-
-#if defined (GPY) || defined (FIPY)
-#include "modlte.h"
-#endif
 
 #include "random.h"
 #include "bootmgr.h"
@@ -64,7 +54,6 @@
 #include "pycom_config.h"
 #include "mpsleep.h"
 #include "machrtc.h"
-//#include "modbt.h"
 #include "machtimer.h"
 #include "machtimer_alarm.h"
 #include "mptask.h"
@@ -95,9 +84,7 @@ extern void modpycom_init0(void);
  ******************************************************************************/
 STATIC void mptask_preinit (void);
 STATIC void mptask_init_sflash_filesystem (void);
-#if defined (LOPY) || defined (SIPY) || defined (LOPY4) || defined (FIPY)
 STATIC void mptask_update_lpwan_mac_address (void);
-#endif
 STATIC void mptask_enable_wifi_ap (void);
 STATIC void mptask_create_main_py (void);
 
@@ -204,7 +191,6 @@ soft_reset:
     mp_hal_init(soft_reset);
     readline_init0();
     mod_network_init0();
-    //modbt_init0();								//NO ES NECESARIO INICIAR BLUETOOTH ES NUESTRA APP
     machtimer_init0();
     modpycom_init0();
     bool safeboot = false;
@@ -218,30 +204,13 @@ soft_reset:
             mptask_enable_wifi_ap();
         }
         // these ones are special because they need uPy running and they launch tasks
-#if defined(LOPY) || defined (LOPY4) || defined (FIPY)
         modlora_init0();
-#endif
-
-//#if defined(SIPY) || defined (FIPY)
-//        modsigfox_init0();
-//#endif
     }
 
     // initialize the serial flash file system
     mptask_init_sflash_filesystem();
-
-#if defined(LOPY) || defined(SIPY) || defined (LOPY4) || defined(FIPY)
     // must be done after initializing the file system
     mptask_update_lpwan_mac_address();
-#endif
-
-
-//#if defined(SIPY) || defined(FIPY)
-//    sigfox_update_id();
-//    sigfox_update_pac();
-//    sigfox_update_private_key();
-//    sigfox_update_public_key();
-//#endif
 
     // append the flash paths to the system path
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash));
@@ -401,7 +370,6 @@ STATIC void mptask_init_sflash_filesystem (void) {
     }
 }
 
-#if defined(LOPY) || defined(SIPY) || defined (LOPY4) || defined(FIPY)
 STATIC void mptask_update_lpwan_mac_address (void) {
     #define LPWAN_MAC_ADDR_PATH          "/flash/sys/lpwan.mac"
 
@@ -429,7 +397,6 @@ STATIC void mptask_update_lpwan_mac_address (void) {
         }
     }
 }
-#endif
 
 STATIC void mptask_enable_wifi_ap (void) {
 	uint8_t wifi_ssid[32];

@@ -211,15 +211,6 @@ APP_SX1276_SRC_C = $(addprefix drivers/sx127x/,\
 	sx1276/sx1276.c \
 	)
 
-APP_SIGFOX_SRC_SIPY_C = $(addprefix sigfox/,\
-	manufacturer_api.c \
-	radio.c \
-	ti_aes_128.c \
-	timer.c \
-	transmission.c \
-	modsigfox.c \
-	)
-
 APP_SIGFOX_SRC_FIPY_LOPY4_C = $(addprefix sigfox/,\
 	manufacturer_api.c \
 	radio_sx127x.c \
@@ -245,14 +236,6 @@ APP_SIGFOX_SPI_SRC_C = $(addprefix lora/,\
 	gpio-board.c \
 	)
 
-APP_LTE_SRC_C = $(addprefix lte/,\
-    lteppp.c \
-    )
-
-APP_MODS_LTE_SRC_C = $(addprefix mods/,\
-    modlte.c \
-    )
-
 APP_TELNET_SRC_C = $(addprefix telnet/,\
 	telnet.c \
 	)
@@ -277,20 +260,11 @@ BOOT_SRC_C = $(addprefix bootloader/,\
 SFX_OBJ =
 
 OBJ = $(PY_O)
-ifeq ($(BOARD), $(filter $(BOARD), LOPY FIPY))
+ifeq ($(BOARD), $(filter $(BOARD), LOPY))
 OBJ += $(addprefix $(BUILD)/, $(APP_LORA_SRC_C:.c=.o) $(APP_LIB_LORA_SRC_C:.c=.o) $(APP_SX1272_SRC_C:.c=.o) $(APP_MODS_LORA_SRC_C:.c=.o))
 endif
 ifeq ($(BOARD), $(filter $(BOARD), LOPY4))
 OBJ += $(addprefix $(BUILD)/, $(APP_LORA_SRC_C:.c=.o) $(APP_LIB_LORA_SRC_C:.c=.o) $(APP_SX1276_SRC_C:.c=.o) $(APP_MODS_LORA_SRC_C:.c=.o))
-endif
-ifeq ($(BOARD), $(filter $(BOARD), SIPY))
-OBJ += $(addprefix $(BUILD)/, $(APP_SIGFOX_MOD_SRC_C:.c=.o))
-endif
-#ifeq ($(BOARD), $(filter $(BOARD), LOPY4 FIPY))
-#OBJ += $(addprefix $(BUILD)/, $(APP_SIGFOX_MOD_SRC_C:.c=.o))
-#endif
-ifeq ($(BOARD),$(filter $(BOARD), FIPY GPY))
-OBJ += $(addprefix $(BUILD)/, $(APP_LTE_SRC_C:.c=.o) $(APP_MODS_LTE_SRC_C:.c=.o))
 endif
 
 OBJ += $(addprefix $(BUILD)/, $(APP_MAIN_SRC_C:.c=.o) $(APP_HAL_SRC_C:.c=.o) $(APP_LIB_SRC_C:.c=.o))
@@ -303,14 +277,8 @@ BOOT_OBJ = $(addprefix $(BUILD)/, $(BOOT_SRC_C:.c=.o))
 
 # List of sources for qstr extraction
 SRC_QSTR += $(APP_MODS_SRC_C) $(APP_UTIL_SRC_C) $(APP_STM_SRC_C)
-ifeq ($(BOARD), $(filter $(BOARD), LOPY LOPY4 FIPY))
+ifeq ($(BOARD), $(filter $(BOARD), LOPY LOPY4))
 SRC_QSTR += $(APP_MODS_LORA_SRC_C)
-endif
-#ifeq ($(BOARD), $(filter $(BOARD), SIPY LOPY4 FIPY))
-#SRC_QSTR += $(APP_SIGFOX_MOD_SRC_C)
-#endif
-ifeq ($(BOARD),$(filter $(BOARD), FIPY GPY))
-SRC_QSTR += $(APP_MODS_LTE_SRC_C)
 endif
 
 # Append any auto-generated sources that are needed by sources listed in
@@ -324,7 +292,7 @@ APP_LDFLAGS += $(LDFLAGS) -T esp32_out.ld -T esp32.common.ld -T esp32.rom.ld -T 
 
 # add the application specific CFLAGS
 CFLAGS += $(APP_INC) -DMICROPY_NLR_SETJMP=1 -DMBEDTLS_CONFIG_FILE='"mbedtls/esp_config.h"' -DHAVE_CONFIG_H -DESP_PLATFORM
-CFLAGS_SIGFOX += $(APP_INC) -DMICROPY_NLR_SETJMP=1 -DMBEDTLS_CONFIG_FILE='"mbedtls/esp_config.h"' -DHAVE_CONFIG_H -DESP_PLATFORM
+#CFLAGS_SIGFOX += $(APP_INC) -DMICROPY_NLR_SETJMP=1 -DMBEDTLS_CONFIG_FILE='"mbedtls/esp_config.h"' -DHAVE_CONFIG_H -DESP_PLATFORM
 CFLAGS += -DREGION_AS923 -DREGION_AU915 -DREGION_EU868 -DREGION_US915
 
 # add the application archive, this order is very important
@@ -335,18 +303,16 @@ BOOT_LIBS = -Wl,--start-group $(B_LIBS) $(BUILD)/bootloader/bootloader.a -Wl,--e
 # debug / optimization options
 ifeq ($(BTYPE), debug)
     CFLAGS += -DDEBUG
-    #CFLAGS_SIGFOX += -DDEBUG
 else
     ifeq ($(BTYPE), release)
         CFLAGS += -DNDEBUG
-        #CFLAGS_SIGFOX += -DNDEBUG
     else
         $(error Invalid BTYPE specified)
     endif
 endif
 
 $(BUILD)/bootloader/%.o: CFLAGS += -D BOOTLOADER_BUILD=1
-$(BUILD)/bootloader/%.o: CFLAGS_SIGFOX += -D BOOTLOADER_BUILD=1
+#$(BUILD)/bootloader/%.o: CFLAGS_SIGFOX += -D BOOTLOADER_BUILD=1
 
 BOOT_OFFSET = 0x1000
 PART_OFFSET = 0x8000
@@ -357,38 +323,12 @@ APP_SIGN = tools/appsign.sh
 
 BOOT_BIN = $(BUILD)/bootloader/bootloader.bin
 
-ifeq ($(BOARD), WIPY)
-    APP_BIN = $(BUILD)/wipy.bin
-endif
 ifeq ($(BOARD), LOPY)
     APP_BIN = $(BUILD)/lopy.bin
 endif
 ifeq ($(BOARD), LOPY4)
     APP_BIN = $(BUILD)/lopy4.bin
-    #$(BUILD)/sigfox/radio_sx127x.o: CFLAGS = $(CFLAGS_SIGFOX)
-    #$(BUILD)/sigfox/timer.o: CFLAGS = $(CFLAGS_SIGFOX)
-    #$(BUILD)/sigfox/transmission.o: CFLAGS = $(CFLAGS_SIGFOX)
-    #$(BUILD)/sigfox/targets/%.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/lora/spi-board.o: CFLAGS = $(CFLAGS_SIGFOX)
-endif
-ifeq ($(BOARD), SIPY)
-    APP_BIN = $(BUILD)/sipy.bin
-    $(BUILD)/sigfox/radio.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/sigfox/timer.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/sigfox/transmission.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/sigfox/targets/%.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/lora/spi-board.o: CFLAGS = $(CFLAGS_SIGFOX)
-endif
-ifeq ($(BOARD), GPY)
-    APP_BIN = $(BUILD)/gpy.bin
-endif
-ifeq ($(BOARD), FIPY)
-    APP_BIN = $(BUILD)/fipy.bin
-    $(BUILD)/sigfox/radio_sx127x.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/sigfox/timer.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/sigfox/transmission.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/sigfox/targets/%.o: CFLAGS = $(CFLAGS_SIGFOX)
-    $(BUILD)/lora/spi-board.o: CFLAGS = $(CFLAGS_SIGFOX)
+    $(BUILD)/lora/spi-board.o: #CFLAGS = $(CFLAGS_SIGFOX)
 endif
 
 APP_IMG  = $(BUILD)/appimg.bin

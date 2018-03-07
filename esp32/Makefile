@@ -43,7 +43,7 @@ CFLAGS_XTENSA_PSRAM = -mfix-esp32-psram-cache-issue
 
 CFLAGS = $(CFLAGS_XTENSA) $(CFLAGS_XTENSA_PSRAM) $(CFLAGS_XTENSA_OPT) -nostdlib -std=gnu99 -g3 -ggdb -fstrict-volatile-bitfields -Iboards/$(BOARD)
 #TODO: SF. Eliminar las flags de comilacion de SIGFOX 
-CFLAGS_SIGFOX = $(CFLAGS_XTENSA) -O2 -nostdlib -std=gnu99 -g3 -ggdb -fstrict-volatile-bitfields -Iboards/$(BOARD)
+#CFLAGS_SIGFOX = $(CFLAGS_XTENSA) -O2 -nostdlib -std=gnu99 -g3 -ggdb -fstrict-volatile-bitfields -Iboards/$(BOARD)
 
 LDFLAGS = -nostdlib -Wl,-Map=$(@:.elf=.map) -Wl,--no-check-sections -u call_user_start_cpu0
 LDFLAGS += -Wl,-static -Wl,--undefined=uxTopUsedPriority -Wl,--gc-sections
@@ -59,19 +59,6 @@ LIBS = -L$(ESP_IDF_COMP_PATH)/esp32/lib -L$(ESP_IDF_COMP_PATH)/esp32/ld \
        $(ESP_IDF_COMP_PATH)/newlib/lib/libc-psram-workaround.a \
        -lfreertos -ljson -ljsmn -llwip -lnewlib -lvfs -lopenssl -lmbedtls -lwpa_supplicant \
        -lxtensa-debug-module  -lsdmmc -lsoc -lheap -u ld_include_panic_highint_hdl \
-
-ifeq ($(BOARD), $(filter $(BOARD), FIPY))
-    LIBS += sigfox/modsigfox_fipy.a
-endif
-
-#TODO: Eliminar esta directiva
-#ifeq ($(BOARD), $(filter $(BOARD), LOPY4))
-#    LIBS += sigfox/modsigfox_lopy4.a
-#endif
-
-ifeq ($(BOARD), $(filter $(BOARD), SIPY))
-    LIBS += sigfox/modsigfox_sipy.a
-endif
 
 B_LIBS = -Lbootloader/lib -Lbootloader -L$(BUILD)/bootloader -L$(ESP_IDF_COMP_PATH)/esp32/ld \
          -L$(ESP_IDF_COMP_PATH)/esp32/lib -llog -lcore -lbootloader_support \
