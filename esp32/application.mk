@@ -210,8 +210,8 @@ APP_SX1272_SRC_C = $(addprefix drivers/sx127x/,\
 APP_SX1276_SRC_C = $(addprefix drivers/sx127x/,\
 	sx1276/sx1276.c \
 	)
-
-APP_SIGFOX_SRC_FIPY_LOPY4_C = $(addprefix sigfox/,\
+	
+#APP_SIGFOX_SRC_FIPY_LOPY4_C = $(addprefix sigfox/,\
 	manufacturer_api.c \
 	radio_sx127x.c \
 	ti_aes_128.c \
@@ -220,18 +220,18 @@ APP_SIGFOX_SRC_FIPY_LOPY4_C = $(addprefix sigfox/,\
 	modsigfox.c \
 	)
 
-APP_SIGFOX_MOD_SRC_C = $(addprefix mods/,\
+#APP_SIGFOX_MOD_SRC_C = $(addprefix mods/,\
 	modsigfox_api.c \
 	)
 
-APP_SIGFOX_TARGET_SRC_C = $(addprefix sigfox/targets/,\
+#APP_SIGFOX_TARGET_SRC_C = $(addprefix sigfox/targets/,\
 	cc112x_spi.c \
 	hal_int.c \
 	hal_spi_rf_trxeb.c \
 	trx_rf_int.c \
 	)
 
-APP_SIGFOX_SPI_SRC_C = $(addprefix lora/,\
+#APP_SIGFOX_SPI_SRC_C = $(addprefix lora/,\
 	spi-board.c \
 	gpio-board.c \
 	)

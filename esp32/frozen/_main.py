@@ -138,7 +138,7 @@ class Node:
 #Codigo principal
                                                          #Desactiva el heartbeat
 app_eui = binascii.unhexlify('70B3D57ED0009F73')                                #ID de la app. (Seleccionada por el usuario)
-dev_eui = binascii.unhexlify('70B3D54998EA594A')
+dev_eui = binascii.unhexlify('70B3D5499CE967FB')
 app_key = binascii.unhexlify('054BFCAC2632EB70D56F4BCBB8D95F02')                #Clave de la app para realizar el handshake. Única para cada dispositivo.
 ajuste = 10                                                                     #Numero de segundos para que el intervalo sea exacto en el Network Server
                                                                                 #TODO: REAL TIME

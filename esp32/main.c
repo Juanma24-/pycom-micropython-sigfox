@@ -115,7 +115,7 @@ void app_main(void) {
         // create the MicroPython task
         mpTaskHandle =
         (TaskHandle_t)xTaskCreateStaticPinnedToCore(TASK_Micropython, "MicroPy", (MICROPY_TASK_STACK_SIZE_PSRAM / sizeof(StackType_t)), NULL,
-                                                    MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB, 1);
+                                                    MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB, 0);
 
     } else {
         micropy_hw_antenna_diversity_pin_num = MICROPY_FIRST_GEN_ANT_SELECT_PIN_NUM;
@@ -138,6 +138,6 @@ void app_main(void) {
         // create the MicroPython task
         mpTaskHandle =
         (TaskHandle_t)xTaskCreateStaticPinnedToCore(TASK_Micropython, "MicroPy", (MICROPY_TASK_STACK_SIZE / sizeof(StackType_t)), NULL,
-                                                    MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB, 1);
+                                                    MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB, 0);
     }
 }

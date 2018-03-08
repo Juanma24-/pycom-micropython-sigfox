@@ -130,13 +130,13 @@ void call_start_cpu0()
     /* completely reset MMU for both CPUs
        (in case serial bootloader was running) */
     Cache_Read_Disable(0);
-    Cache_Read_Disable(1);
+    //Cache_Read_Disable(1);
     Cache_Flush(0);
-    Cache_Flush(1);
+    //Cache_Flush(1);
     mmu_init(0);
-    DPORT_REG_SET_BIT(DPORT_APP_CACHE_CTRL1_REG, DPORT_APP_CACHE_MMU_IA_CLR);
-    mmu_init(1);
-    DPORT_REG_CLR_BIT(DPORT_APP_CACHE_CTRL1_REG, DPORT_APP_CACHE_MMU_IA_CLR);
+    //DPORT_REG_SET_BIT(DPORT_APP_CACHE_CTRL1_REG, DPORT_APP_CACHE_MMU_IA_CLR);
+    //mmu_init(1);
+    //DPORT_REG_CLR_BIT(DPORT_APP_CACHE_CTRL1_REG, DPORT_APP_CACHE_MMU_IA_CLR);
     /* (above steps probably unnecessary for most serial bootloader
        usage, all that's absolutely needed is that we unmask DROM0
        cache on the following two lines - normal ROM boot exits with
@@ -148,7 +148,7 @@ void call_start_cpu0()
        necessary to work around a hardware bug.
     */
     DPORT_REG_CLR_BIT(DPORT_PRO_CACHE_CTRL1_REG, DPORT_PRO_CACHE_MASK_DROM0);
-    DPORT_REG_CLR_BIT(DPORT_APP_CACHE_CTRL1_REG, DPORT_APP_CACHE_MASK_DROM0);
+    //DPORT_REG_CLR_BIT(DPORT_APP_CACHE_CTRL1_REG, DPORT_APP_CACHE_MASK_DROM0);
 
     bootloader_main();
 }
