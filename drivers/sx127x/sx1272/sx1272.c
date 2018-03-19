@@ -33,7 +33,7 @@ Maintainer: Miguel Luis and Gregory Cristian
 #include "sx1272.h"
 #include "sx1272-board.h"
 #include "esp_attr.h"
-#include "py/mphal.h"
+#include "esp32_mphal.h"
 
 /*
  * Local types definition
@@ -1054,8 +1054,6 @@ static IRAM_ATTR void SX1272OnDioIrq (void) {
         }
     }
 }
-
-extern uint64_t system_get_rtc_time(void);
 
 IRAM_ATTR void SX1272OnDio0Irq( void )
 {
