@@ -234,6 +234,12 @@ soft_reset:
 
     pyexec_frozen_module("_boot.py");
 
+    if (!soft_reset) {
+    #if defined(GPY) || defined (FIPY)
+        modlte_init0();
+    #endif
+    }
+
     if (!safeboot) {
         // run boot.py
         int ret = pyexec_file("boot.py");
