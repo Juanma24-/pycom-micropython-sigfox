@@ -8,9 +8,7 @@ import binascii
 import pycom
 import time
 import machine
-from machine import WDT
-from machine import Timer
-from OTA import WiFiOTA
+#from OTA import WiFiOTA
 #------------------------------------------------------------------------------#
 #Librerias Pysense y sensores
 from pysense import Pysense
@@ -70,7 +68,7 @@ class Node:
                 self.lora.nvram_restore()
             except OSError:
                 print("Error: LoRa Configuration could not be restored")
-                self.connect(binascii.unhexlify('70B3D57EF00042A4'),binascii.unhexlify('3693926E05B301A502ABCFCA430DA52A'))
+                self.connect(dev_eui,app_eui,app_key)
                 print("LoRa Connection Parameters Recovered")
         # remove all the non-default channels
         for i in range(3, 16):
@@ -137,10 +135,10 @@ class Node:
 #------------------------------------------------------------------------------#
 #Codigo principal
                                                          #Desactiva el heartbeat
-app_eui = binascii.unhexlify('70B3D57ED0009F73')                                #ID de la app. (Seleccionada por el usuario)
-dev_eui = binascii.unhexlify('70B3D5499CE967FB')
-app_key = binascii.unhexlify('054BFCAC2632EB70D56F4BCBB8D95F02')                #Clave de la app para realizar el handshake. Única para cada dispositivo.
-ajuste = 10                                                                     #Numero de segundos para que el intervalo sea exacto en el Network Server
+app_eui = binascii.unhexlify('BE7A000000000906')                                #ID de la app. (Seleccionada por el usuario)
+dev_eui = binascii.unhexlify('BE7A000000002455')
+app_key = binascii.unhexlify('61F0D7D0112265B4705D44E80E7F0694')                #Clave de la app para realizar el handshake. Única para cada dispositivo.
+ajuste = 5                                                                    #Numero de segundos para que el intervalo sea exacto en el Network Server
                                                                                 #TODO: REAL TIME
 py = Pysense()
 #------------------------------------------------------------------------------#
@@ -151,7 +149,7 @@ if py.get_wake_reason() == WAKE_REASON_TIMER:                                   
     try:
         sleep_time = pycom.nvs_get('sleep_time')                                #Obtiene el valor de la variable sleep_time guardado en NVRAM
         data_rate = pycom.nvs_get('data_rate')
-    except 0:                                                                   #No se consigue obtener el valor (ERROR INFO: https://forum.pycom.io/topic/1869/efficiency-of-flash-vs-nvram-and-some-nvs-questions/3)
+    except Exception:                                                                   #No se consigue obtener el valor (ERROR INFO: https://forum.pycom.io/topic/1869/efficiency-of-flash-vs-nvram-and-some-nvs-questions/3)
         print("Error: Sleep Time / Data Rate could not be recovered. Setting default value")
         sleep_time = 300                                                        #Se le da el valor por defecto
         data_rate = 5
@@ -201,7 +199,7 @@ else:                                                                           
     try:
         pycom.nvs_set('sleep_time', sleep_time)                                 #Guarda el valor por defecto de sleep_time en NVRAM
         pycom.nvs_set('data_rate', data_rate)
-    except (None):
+    except (Exception):
         print("Error: Value could not be stored")
         pass
 
@@ -210,8 +208,8 @@ else:                                                                           
     #ota = WiFiOTA(WIFI_SSID,WIFI_PW,
     #          SERVER_IP,  # Update server address
     #          8000)  # Update server port
-    lecturas = n.readsens()                                                     #Envío de las lecturas
-    n.send(lecturas)
+    #Envío de las lecturas
+    n.send(n.readsens())
     print("Data Sent, sleeping ...")
     print('- ' * 20)
     n.py.setup_int_wake_up(rising=1,falling=0)                                  # Activa la interrupcion para el boton DEBUG

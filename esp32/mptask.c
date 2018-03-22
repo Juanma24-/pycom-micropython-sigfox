@@ -132,7 +132,7 @@ void TASK_Micropython (void *pvParameters) {
     }
 
     // initialization that must not be repeated after a soft reset
-    mptask_preinit();
+    //mptask_preinit();
 #if MICROPY_PY_THREAD
     mp_thread_preinit(mpTaskStack, stack_len);
     mp_irq_preinit();
