@@ -93,7 +93,7 @@ btree/bt_split.c \
 btree/bt_utils.c \
 mpool/mpool.c \
 	)
-CFLAGS_MOD += -DMICROPY_PY_BTREE=1
+CFLAGS_MOD += -DMICROPY_PY_BTREE=0				#Modified from 1
 # we need to suppress certain warnings to get berkeley-db to compile cleanly
 $(BUILD)/$(BTREE_DIR)/%.o: CFLAGS += -Wno-old-style-definition -Wno-sign-compare -Wno-unused-parameter
 endif

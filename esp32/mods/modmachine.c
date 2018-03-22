@@ -53,6 +53,8 @@
 #include "esp_event.h"
 #include "esp_sleep.h"
 #include "soc/timer_group_struct.h"
+#include "esp_flash_encrypt.h"
+#include "esp_secure_boot.h"
 
 #include "random.h"
 #include "extmod/machine_mem.h"
@@ -68,11 +70,11 @@
 #include "pybadc.h"
 #include "pybdac.h"
 #include "pybsd.h"
-#include "modbt.h"
 #include "modwlan.h"
 #include "machwdt.h"
 #include "machcan.h"
 #include "machrmt.h"
+#include "pycom_config.h"
 #if defined (GPY) || defined (FIPY)
 #include "lteppp.h"
 #endif
@@ -118,7 +120,6 @@ void machine_init0(void) {
 extern TaskHandle_t mpTaskHandle;
 extern TaskHandle_t svTaskHandle;
 extern TaskHandle_t xLoRaTaskHndl;
-extern TaskHandle_t xSigfoxTaskHndl;
 
 STATIC mp_obj_t machine_info(void) {
     // FreeRTOS info
@@ -127,12 +128,7 @@ STATIC mp_obj_t machine_info(void) {
     mp_printf(&mp_plat_print, "---------------------------------------------\n");
     mp_printf(&mp_plat_print, "MPTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark((TaskHandle_t)mpTaskHandle));
     mp_printf(&mp_plat_print, "ServersTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark((TaskHandle_t)svTaskHandle));
-#if defined (LOPY) || defined (LOPY4) || defined (FIPY)
     mp_printf(&mp_plat_print, "LoRaTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark((TaskHandle_t)xLoRaTaskHndl));
-#endif
-#if defined (SIPY) || defined (LOPY4) || defined (FIPY)
-    mp_printf(&mp_plat_print, "SigfoxTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark((TaskHandle_t)xSigfoxTaskHndl));
-#endif
     mp_printf(&mp_plat_print, "TimerTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark(xTimerGetTimerDaemonTaskHandle()));
     mp_printf(&mp_plat_print, "IdleTask stack water mark: %d\n", (unsigned int)uxTaskGetStackHighWaterMark(xTaskGetIdleTaskHandle()));
     mp_printf(&mp_plat_print, "System free heap: %d\n", (unsigned int)esp_get_free_heap_size());
@@ -185,7 +181,6 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_sleep_obj, machine_sleep);
 
 STATIC mp_obj_t machine_deepsleep (uint n_args, const mp_obj_t *arg) {
     mperror_enable_heartbeat(false);
-    bt_deinit(NULL);
     wlan_deinit(NULL);
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH,ESP_PD_OPTION_OFF);   //Perifericos off
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM,ESP_PD_OPTION_OFF);
@@ -309,6 +304,15 @@ STATIC mp_obj_t machine_temperature (void) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_temperature_obj, machine_temperature);
 
+STATIC mp_obj_t flash_encrypt (void) {
+	return mp_obj_new_int(esp_flash_encryption_enabled());
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_flash_encrypt_obj, flash_encrypt);
+
+STATIC mp_obj_t secure_boot (void) {
+	return mp_obj_new_int(esp_secure_boot_enabled());
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_secure_boot_obj, secure_boot);
 
 STATIC const mp_rom_map_elem_t machine_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR___name__),                MP_OBJ_NEW_QSTR(MP_QSTR_umachine) },
@@ -334,7 +338,8 @@ STATIC const mp_rom_map_elem_t machine_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR_enable_irq),              (mp_obj_t)&machine_enable_irq_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_info),                    (mp_obj_t)&machine_info_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_temperature),             (mp_obj_t)&machine_temperature_obj },
-
+    { MP_OBJ_NEW_QSTR(MP_QSTR_flash_encrypt),           (mp_obj_t)&machine_flash_encrypt_obj },
+	{ MP_OBJ_NEW_QSTR(MP_QSTR_secure_boot),           	(mp_obj_t)&machine_secure_boot_obj },
 
     { MP_OBJ_NEW_QSTR(MP_QSTR_Pin),                     (mp_obj_t)&pin_type },
     { MP_OBJ_NEW_QSTR(MP_QSTR_UART),                    (mp_obj_t)&mach_uart_type },

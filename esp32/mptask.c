@@ -34,6 +34,7 @@
 #include "readline.h"
 #include "esp32_mphal.h"
 #include "machuart.h"
+#include "machwdt.h"
 #include "machpin.h"
 #include "mpexception.h"
 #include "moduos.h"
@@ -46,16 +47,7 @@
 #include "modled.h"
 #include "esp_log.h"
 
-#if defined (LOPY) || defined (LOPY4) || defined (FIPY)
 #include "modlora.h"
-#endif
-//TODO:Eliminar de LOPY4
-#if defined (SIPY) || defined(LOPY4) || defined (FIPY)
-#include "sigfox/modsigfox.h"
-#endif
-#if defined (GPY) || defined (FIPY)
-#include "modlte.h"
-#endif
 
 #include "random.h"
 #include "bootmgr.h"
@@ -63,8 +55,6 @@
 #include "pycom_config.h"
 #include "mpsleep.h"
 #include "machrtc.h"
-//TODO: Eliminar Bluetooth
-#include "modbt.h"
 #include "machtimer.h"
 #include "machtimer_alarm.h"
 #include "mptask.h"
@@ -95,9 +85,7 @@ extern void modpycom_init0(void);
  ******************************************************************************/
 STATIC void mptask_preinit (void);
 STATIC void mptask_init_sflash_filesystem (void);
-#if defined (LOPY) || defined (SIPY) || defined (LOPY4) || defined (FIPY)
 STATIC void mptask_update_lpwan_mac_address (void);
-#endif
 STATIC void mptask_enable_wifi_ap (void);
 STATIC void mptask_create_main_py (void);
 
@@ -144,7 +132,7 @@ void TASK_Micropython (void *pvParameters) {
     }
 
     // initialization that must not be repeated after a soft reset
-    mptask_preinit();
+    //mptask_preinit();
 #if MICROPY_PY_THREAD
     mp_thread_preinit(mpTaskStack, stack_len);
     mp_irq_preinit();
@@ -170,7 +158,7 @@ void TASK_Micropython (void *pvParameters) {
         for ( ; ; );
     }
 
-    alarm_preinit();
+    mach_timer_alarm_preinit();
     pin_preinit();
 
     wifi_on_boot = config_get_wifi_on_boot();			//IDEALMENTE SERÍA FALSE PERO SE QUEDA POR SEGURIDAD
@@ -204,7 +192,6 @@ soft_reset:
     mp_hal_init(soft_reset);
     readline_init0();
     mod_network_init0();
-    //modbt_init0();								//NO ES NECESARIO INICIAR BLUETOOTH ES NUESTRA APP
     machtimer_init0();
     modpycom_init0();
     bool safeboot = false;
@@ -214,34 +201,24 @@ soft_reset:
         safeboot = boot_info.safeboot;
     }
     if (!soft_reset) {
+        if (config_get_wdt_on_boot()) {
+            uint32_t timeout_ms = config_get_wdt_on_boot_timeout();
+            if (timeout_ms < 0xFFFFFFFF) {
+                printf("Starting the WDT on boot\n");
+                machine_wdt_start(timeout_ms);
+            }
+        }
         if (wifi_on_boot) {
             mptask_enable_wifi_ap();
         }
         // these ones are special because they need uPy running and they launch tasks
-#if defined(LOPY) || defined (LOPY4) || defined (FIPY)
         modlora_init0();
-#endif
-//TODO: Eliminar Sigfox para Lopy4
-#if defined(SIPY) || defined (FIPY)|| defined (LOPY4)
-        modsigfox_init0();
-#endif
     }
 
     // initialize the serial flash file system
     mptask_init_sflash_filesystem();
-
-#if defined(LOPY) || defined(SIPY) || defined (LOPY4) || defined(FIPY)
     // must be done after initializing the file system
     mptask_update_lpwan_mac_address();
-#endif
-
-//TODO: Eliminar Sigfox para Lopy4
-#if defined(SIPY) || defined(FIPY) || defined(LOPY4)
-    sigfox_update_id();
-    sigfox_update_pac();
-    sigfox_update_private_key();
-    sigfox_update_public_key();
-#endif
 
     // append the flash paths to the system path
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash));
@@ -251,16 +228,19 @@ soft_reset:
     MP_STATE_PORT(machine_config_main) = MP_OBJ_NULL;
 
     // enable telnet and ftp
-    if (wifi_on_boot) {
-        servers_start();
-    }
+    //if (wifi_on_boot) {
+    //    servers_start();
+    //}
 
     pyexec_frozen_module("_boot.py");
 
-    if (!safeboot) {
+    if (!soft_reset) {
     #if defined(GPY) || defined (FIPY)
         modlte_init0();
     #endif
+    }
+
+    if (!safeboot) {
         // run boot.py
         int ret = pyexec_file("boot.py");
         if (ret & PYEXEC_FORCED_EXIT) {
@@ -335,7 +315,7 @@ soft_reset_exit:
 STATIC void mptask_preinit (void) {
     mperror_pre_init();
     //wlan_pre_init();
-    xTaskCreatePinnedToCore(TASK_Servers, "Servers", SERVERS_STACK_LEN, NULL, SERVERS_PRIORITY, &svTaskHandle, 1);
+    //xTaskCreatePinnedToCore(TASK_Servers, "Servers", SERVERS_STACK_LEN, NULL, SERVERS_PRIORITY, &svTaskHandle, 1);
 }
 
 STATIC void mptask_init_sflash_filesystem (void) {
@@ -401,7 +381,6 @@ STATIC void mptask_init_sflash_filesystem (void) {
     }
 }
 
-#if defined(LOPY) || defined(SIPY) || defined (LOPY4) || defined(FIPY)
 STATIC void mptask_update_lpwan_mac_address (void) {
     #define LPWAN_MAC_ADDR_PATH          "/flash/sys/lpwan.mac"
 
@@ -429,7 +408,6 @@ STATIC void mptask_update_lpwan_mac_address (void) {
         }
     }
 }
-#endif
 
 STATIC void mptask_enable_wifi_ap (void) {
 	uint8_t wifi_ssid[32];

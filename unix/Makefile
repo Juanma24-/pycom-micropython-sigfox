@@ -222,7 +222,8 @@ nanbox:
 	BUILD=build-nanbox \
 	PROG=micropython_nanbox \
 	MICROPY_FORCE_32BIT=1 \
-	MICROPY_PY_USSL=0
+	MICROPY_PY_USSL=0 \
+	MICROPY_PY_THREAD=1
 
 freedos:
 	$(MAKE) \

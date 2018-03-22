@@ -11,18 +11,6 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "controller.h"
-
-#include "esp_bt.h"
-#include "bt_trace.h"
-#include "bt_types.h"
-#include "btm_api.h"
-#include "bta_api.h"
-#include "bta_gatt_api.h"
-#include "esp_gap_ble_api.h"
-#include "esp_gattc_api.h"
-#include "esp_gatt_defs.h"
-#include "esp_bt_main.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -49,20 +37,13 @@
 #include "mptask.h"
 #include "machpin.h"
 #include "pins.h"
+#include "mperror.h"
+#include "machtimer.h"
 
 
 TaskHandle_t mpTaskHandle;
 TaskHandle_t svTaskHandle;
-#if defined(LOPY) || defined (LOPY4) || defined (FIPY)
 TaskHandle_t xLoRaTaskHndl;
-#endif
-//TODO: Eliminar de LOPY4
-#if defined(SIPY) || defined (LOPY4) || defined (FIPY)
-TaskHandle_t xSigfoxTaskHndl;
-#endif
-#if defined(GPY) || defined (FIPY)
-TaskHandle_t xLTETaskHndl;
-#endif
 
 extern void machine_init0(void);
 
@@ -104,6 +85,9 @@ void app_main(void) {
     // remove all the logs from the IDF
     esp_log_level_set("*", ESP_LOG_NONE);
 
+    // setup the timer used as a reference in mphal
+    machtimer_preinit();
+
     // this one gets the remaining sleep time
     machine_init0();
 
@@ -113,7 +97,14 @@ void app_main(void) {
         nvs_flash_init();
     }
 
-    micropy_hw_flash_size = spi_flash_get_chip_size();
+    // initialise heartbeat on Core 0
+    mperror_pre_init();
+
+    // differentiate the Flash Size (either 8MB or 4MB) based on ESP32 rev id
+    micropy_hw_flash_size = (esp_get_revision() > 0 ? 0x800000 : 0x400000);
+
+    // propagating the Flash Size in the global variable (used in multiple IDF modules)
+    g_rom_flashchip.chip_size = micropy_hw_flash_size;
 
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
@@ -136,7 +127,7 @@ void app_main(void) {
         // create the MicroPython task
         mpTaskHandle =
         (TaskHandle_t)xTaskCreateStaticPinnedToCore(TASK_Micropython, "MicroPy", (MICROPY_TASK_STACK_SIZE_PSRAM / sizeof(StackType_t)), NULL,
-                                                    MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB, 1);
+                                                    MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB, 0);
 
     } else {
         micropy_hw_antenna_diversity_pin_num = MICROPY_FIRST_GEN_ANT_SELECT_PIN_NUM;
@@ -159,6 +150,6 @@ void app_main(void) {
         // create the MicroPython task
         mpTaskHandle =
         (TaskHandle_t)xTaskCreateStaticPinnedToCore(TASK_Micropython, "MicroPy", (MICROPY_TASK_STACK_SIZE / sizeof(StackType_t)), NULL,
-                                                    MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB, 1);
+                                                    MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB, 0);
     }
 }
