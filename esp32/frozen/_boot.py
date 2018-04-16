@@ -1,14 +1,12 @@
-#from machine import UART
-#import os
-#UART no activa
-#uart = UART(0, 115200)
-#os.dupterm(uart)
+from machine import UART
+import os
+import machine
 #-----------------------#
-#Desactiva Bluetooth
-#bt = Bluetooth()
-#bt.deinit()
+#UART no activa
+uart = UART(0, 115200)
+os.dupterm(uart)
 #-----------------------#
 #Imprime version del Firmware OS
-#print('Version OS:' + os.uname().release)
-#print("Machine CPU frequency: %dMHz" %(machine.freq()/1000000))
-#-----------------------#
+print('Version OS:' + os.uname().release)
+print("Machine CPU frequency: %dMHz" %(machine.freq()/1000000))
+#print("Machine ID:" + ubinascii.hexlify(machine.unique_id()))

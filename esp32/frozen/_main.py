@@ -3,12 +3,13 @@
 #UPC-ALSTOM 2017
 #------------------------------------------------------------------------------#
 from network import LoRa, WLAN
+import network
 import socket
 import binascii
 import pycom
 import time
 import machine
-#from OTA import WiFiOTA
+from OTA import WiFiOTA
 #------------------------------------------------------------------------------#
 #Librerias Pysense y sensores
 from pysense import Pysense
@@ -114,11 +115,12 @@ class Node:
                 print("Cambiando Data Rate %d" %(int.from_bytes(rx[1:],'big')))
                 self.dr = int.from_bytes(rx[1:],'big')                          #Decodifica el valor del nuevo data Rate
                 pycom.nvs_set('data_rate',self.data_rate)                       #Lo guarda en NVRAM
-            elif rx[0] == 79:
-                print("Performing OTA")
-                #ota.connect()
-                #ota.update()
-                pass
+            elif rx[0] == 79:                                                   #4Fh
+                ota = WiFiOTA('MBP_JuanMa','MBP_JuanMa',"54.154.225.138",8000)      #Amazon Web Services Server
+                print("Updating via OTA...")
+                print('- ' * 20)
+                ota.connect()
+                ota.update()
             else:
                 pass
 #------------------------------------------------------------------------------#
@@ -135,9 +137,9 @@ class Node:
 #------------------------------------------------------------------------------#
 #Codigo principal
                                                          #Desactiva el heartbeat
-app_eui = binascii.unhexlify('BE7A000000000906')                                #ID de la app. (Seleccionada por el usuario)
-dev_eui = binascii.unhexlify('BE7A000000002455')
-app_key = binascii.unhexlify('61F0D7D0112265B4705D44E80E7F0694')                #Clave de la app para realizar el handshake. Única para cada dispositivo.
+app_eui = binascii.unhexlify('70B3D57ED0009F73')                                #ID de la app. (Seleccionada por el usuario)
+dev_eui = binascii.unhexlify('70B3D5499CE967FB')
+app_key = binascii.unhexlify('054BFCAC2632EB70D56F4BCBB8D95F02')                #Clave de la app para realizar el handshake. Única para cada dispositivo.
 ajuste = 5                                                                    #Numero de segundos para que el intervalo sea exacto en el Network Server
                                                                                 #TODO: REAL TIME
 py = Pysense()
@@ -179,20 +181,19 @@ elif (py.get_wake_reason() == WAKE_REASON_PUSH_BUTTON):
     uart = UART(0, 115200)                                                      #Se activa la UART
     os.dupterm(uart)
     wlan = WLAN()
-    wlan.init(mode=WLAN.AP, ssid='lopy-pysense', auth=(WLAN.WPA2,'lopy-pysense'), channel=7,antenna=WLAN.INT_ANT) #Inicia el servidor FTP
-
+    wlan.init(mode=WLAN.AP, ssid='lopy-pysense', auth=(network.WLAN.WPA2,'lopy-pysense'), channel=7,antenna=WLAN.INT_ANT) #Init Wi-Fi
+    server = network.Server()                                                   #Init FTP Server
     print("Device entered into debugging mode")
     print("Please do not connect to battery")
     pycom.heartbeat(True)                                                       #Se activa el Heartbeat
     while(1):
         if py.button_pressed():
-            print("Exit DEBUG MODE, reseting...")
-            print('- ' * 20)
+            print("Resetting")
             machine.reset()
 
 else:                                                                           #Si viene de Boot o Hard Reset
     print('Power on or hard reset')
-    sleep_time = 300                                                            #Valor por defecto de sleep_time (Minimo segun Fair Acess Policy TTN)
+    sleep_time = 100                                                            #Valor por defecto de sleep_time (Minimo segun Fair Acess Policy TTN)
     data_rate = 5
     pycom.wifi_on_boot(False)                                                   # disable WiFi on boot TODO: Intentar en versiones posteriores, da un Core Error.
     pycom.heartbeat_on_boot(False)
@@ -205,9 +206,7 @@ else:                                                                           
 
     n = Node(sleep_time,data_rate,py)                                           #Crea una instancia de Node
     n.connect(dev_eui,app_eui, app_key)                                                 #Join LoRaWAN with OTAA
-    #ota = WiFiOTA(WIFI_SSID,WIFI_PW,
-    #          SERVER_IP,  # Update server address
-    #          8000)  # Update server port
+
     #Envío de las lecturas
     n.send(n.readsens())
     print("Data Sent, sleeping ...")

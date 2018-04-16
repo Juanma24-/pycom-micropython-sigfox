@@ -169,6 +169,9 @@ void wlan_pre_init (void) {
 
 void wlan_setup (int32_t mode, const char *ssid, uint32_t auth, const char *key, uint32_t channel, uint32_t antenna, bool add_mac, bool hidden) {
 
+	//Llamada a pre-init (no hecho en mptask)
+	wlan_pre_init();
+
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 

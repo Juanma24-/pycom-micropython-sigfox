@@ -46,6 +46,7 @@ typedef struct {
  ******************************************************************************/
 static volatile servers_data_t servers_data = {.timeout = SERVERS_DEF_TIMEOUT_MS};
 static volatile bool sleep_sockets = false;
+extern TaskHandle_t svTaskHandle;
 
 /******************************************************************************
  DECLARE PRIVATE FUNCTIONS
@@ -131,6 +132,8 @@ void TASK_Servers (void *pvParameters) {
 }
 
 void servers_start (void) {
+	xTaskCreatePinnedToCore(TASK_Servers, "Servers", SERVERS_STACK_LEN, NULL, SERVERS_PRIORITY, &svTaskHandle, 0);
+	mp_hal_delay_ms(SERVERS_CYCLE_TIME_MS * 3);
     servers_data.do_enable = true;
     mp_hal_delay_ms(SERVERS_CYCLE_TIME_MS * 3);
 }
